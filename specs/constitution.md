@@ -54,6 +54,11 @@ interfaces it depends on.
 - **Finding new skills**: when a task would benefit from a skill this repo
   doesn't have yet, use the `find-skills` skill before building one from
   scratch.
+- **Reuse over re-deriving**: before writing a new component/helper, check
+  `docs/catalog.md` (via the `reuse` skill). When you build something
+  generic enough for another feature to need later, extract it to a shared
+  location and catalog it in the same change — this is what keeps future
+  sessions from re-investigating the same ground and burning tokens on it.
 
 ## 5. Testing bar
 

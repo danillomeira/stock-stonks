@@ -70,7 +70,8 @@ backend/            API Go (domain → repository → service → httpserver →
 frontend/           App Next.js
 specs/              Specs orientadas a feature (spec-kit style) + constitution.md
 docs/adr/           Architecture Decision Records
-.claude/skills/     Skills para agentes de IA (find-skills, adr, documentation)
+.claude/skills/     Skills para agentes de IA (find-skills, adr, documentation, reuse)
+docs/catalog.md     Índice de componentes/helpers reutilizáveis (ver skill `reuse`)
 .github/workflows/  CI (lint/test/build) + publicação de imagens no GHCR
 ```
 

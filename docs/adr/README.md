@@ -13,3 +13,4 @@ when and how to add one.
 | [0005](0005-position-is-computed-not-stored.md) | Position is always computed, never stored |
 | [0006](0006-spec-kit-style-workflow-for-ai-agents.md) | Spec-kit style spec-driven workflow for AI agents |
 | [0007](0007-ci-only-pipeline-no-deploy-target-yet.md) | CI-only pipeline for now; no live deploy target yet |
+| [0008](0008-reuse-catalog-for-components-and-helpers.md) | Maintain a reuse catalog for generic components/helpers |

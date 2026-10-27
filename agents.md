@@ -24,6 +24,8 @@ This repo ships project-level skills in `.claude/skills/`:
   ad-hoc tooling for a recurring kind of task.
 - **adr** — when and how to record an Architecture Decision Record.
 - **documentation** — keep README/specs/ADRs in sync after a change.
+- **reuse** — check `docs/catalog.md` before writing a new component/helper;
+  catalog it if you build something generic enough to reuse later.
 
 ## Workflow for non-trivial changes
 
