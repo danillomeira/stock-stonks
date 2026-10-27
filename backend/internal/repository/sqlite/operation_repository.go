@@ -26,10 +26,10 @@ func (r *OperationRepository) Create(ctx context.Context, op *domain.Operation) 
 	})
 }
 
-func (r *OperationRepository) GetByID(ctx context.Context, id uint) (*domain.Operation, error) {
+func (r *OperationRepository) GetByID(ctx context.Context, userID, id uint) (*domain.Operation, error) {
 	var op domain.Operation
 	err := database.WithRetry(ctx, r.retry, func() error {
-		return r.db.WithContext(ctx).Preload("Asset").First(&op, id).Error
+		return r.db.WithContext(ctx).Preload("Asset").Where("user_id = ?", userID).First(&op, id).Error
 	})
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, repository.ErrNotFound
@@ -43,7 +43,7 @@ func (r *OperationRepository) GetByID(ctx context.Context, id uint) (*domain.Ope
 func (r *OperationRepository) List(ctx context.Context, filter repository.OperationFilter) ([]domain.Operation, error) {
 	var ops []domain.Operation
 	err := database.WithRetry(ctx, r.retry, func() error {
-		q := r.db.WithContext(ctx).Preload("Asset").Order("date")
+		q := r.db.WithContext(ctx).Preload("Asset").Where("user_id = ?", filter.UserID).Order("date")
 		if filter.AssetID != nil {
 			q = q.Where("asset_id = ?", *filter.AssetID)
 		}
@@ -60,13 +60,31 @@ func (r *OperationRepository) List(ctx context.Context, filter repository.Operat
 
 func (r *OperationRepository) Update(ctx context.Context, op *domain.Operation) error {
 	return database.WithRetry(ctx, r.retry, func() error {
-		return r.db.WithContext(ctx).Save(op).Error
+		res := r.db.WithContext(ctx).
+			Model(&domain.Operation{}).
+			Where("id = ? AND user_id = ?", op.ID, op.UserID).
+			Updates(map[string]any{
+				"asset_id":   op.AssetID,
+				"date":       op.Date,
+				"type":       op.Type,
+				"quantity":   op.Quantity,
+				"unit_price": op.UnitPrice,
+				"fees":       op.Fees,
+				"broker":     op.Broker,
+			})
+		if res.Error != nil {
+			return res.Error
+		}
+		if res.RowsAffected == 0 {
+			return repository.ErrNotFound
+		}
+		return nil
 	})
 }
 
-func (r *OperationRepository) Delete(ctx context.Context, id uint) error {
+func (r *OperationRepository) Delete(ctx context.Context, userID, id uint) error {
 	return database.WithRetry(ctx, r.retry, func() error {
-		res := r.db.WithContext(ctx).Delete(&domain.Operation{}, id)
+		res := r.db.WithContext(ctx).Where("user_id = ?", userID).Delete(&domain.Operation{}, id)
 		if res.Error != nil {
 			return res.Error
 		}

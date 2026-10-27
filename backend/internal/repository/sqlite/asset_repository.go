@@ -33,10 +33,10 @@ func (r *AssetRepository) Create(ctx context.Context, asset *domain.Asset) error
 	return err
 }
 
-func (r *AssetRepository) GetByID(ctx context.Context, id uint) (*domain.Asset, error) {
+func (r *AssetRepository) GetByID(ctx context.Context, userID, id uint) (*domain.Asset, error) {
 	var asset domain.Asset
 	err := database.WithRetry(ctx, r.retry, func() error {
-		return r.db.WithContext(ctx).First(&asset, id).Error
+		return r.db.WithContext(ctx).Where("user_id = ?", userID).First(&asset, id).Error
 	})
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, repository.ErrNotFound
@@ -47,10 +47,10 @@ func (r *AssetRepository) GetByID(ctx context.Context, id uint) (*domain.Asset, 
 	return &asset, nil
 }
 
-func (r *AssetRepository) GetByTicker(ctx context.Context, ticker string) (*domain.Asset, error) {
+func (r *AssetRepository) GetByTicker(ctx context.Context, userID uint, ticker string) (*domain.Asset, error) {
 	var asset domain.Asset
 	err := database.WithRetry(ctx, r.retry, func() error {
-		return r.db.WithContext(ctx).Where("ticker = ?", ticker).First(&asset).Error
+		return r.db.WithContext(ctx).Where("user_id = ? AND ticker = ?", userID, ticker).First(&asset).Error
 	})
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, repository.ErrNotFound
@@ -61,17 +61,31 @@ func (r *AssetRepository) GetByTicker(ctx context.Context, ticker string) (*doma
 	return &asset, nil
 }
 
-func (r *AssetRepository) List(ctx context.Context) ([]domain.Asset, error) {
+func (r *AssetRepository) List(ctx context.Context, userID uint) ([]domain.Asset, error) {
 	var assets []domain.Asset
 	err := database.WithRetry(ctx, r.retry, func() error {
-		return r.db.WithContext(ctx).Order("ticker").Find(&assets).Error
+		return r.db.WithContext(ctx).Where("user_id = ?", userID).Order("ticker").Find(&assets).Error
 	})
 	return assets, err
 }
 
 func (r *AssetRepository) Update(ctx context.Context, asset *domain.Asset) error {
 	err := database.WithRetry(ctx, r.retry, func() error {
-		return r.db.WithContext(ctx).Save(asset).Error
+		res := r.db.WithContext(ctx).
+			Model(&domain.Asset{}).
+			Where("id = ? AND user_id = ?", asset.ID, asset.UserID).
+			Updates(map[string]any{
+				"ticker": asset.Ticker,
+				"name":   asset.Name,
+				"type":   asset.Type,
+			})
+		if res.Error != nil {
+			return res.Error
+		}
+		if res.RowsAffected == 0 {
+			return repository.ErrNotFound
+		}
+		return nil
 	})
 	if isUniqueConstraintErr(err) {
 		return repository.ErrDuplicateTicker
@@ -79,9 +93,9 @@ func (r *AssetRepository) Update(ctx context.Context, asset *domain.Asset) error
 	return err
 }
 
-func (r *AssetRepository) Delete(ctx context.Context, id uint) error {
+func (r *AssetRepository) Delete(ctx context.Context, userID, id uint) error {
 	return database.WithRetry(ctx, r.retry, func() error {
-		res := r.db.WithContext(ctx).Delete(&domain.Asset{}, id)
+		res := r.db.WithContext(ctx).Where("user_id = ?", userID).Delete(&domain.Asset{}, id)
 		if res.Error != nil {
 			return res.Error
 		}

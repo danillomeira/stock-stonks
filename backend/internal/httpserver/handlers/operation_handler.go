@@ -43,6 +43,11 @@ func (req operationRequest) toDomain() *domain.Operation {
 }
 
 func (h *OperationHandler) Create(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	var req operationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: "invalid request body"})
@@ -50,7 +55,7 @@ func (h *OperationHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	op := req.toDomain()
-	if err := h.operations.Create(r.Context(), op); err != nil {
+	if err := h.operations.Create(r.Context(), userID, op); err != nil {
 		writeError(w, err)
 		return
 	}
@@ -58,13 +63,18 @@ func (h *OperationHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OperationHandler) Get(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
 		return
 	}
 
-	op, err := h.operations.Get(r.Context(), id)
+	op, err := h.operations.Get(r.Context(), userID, id)
 	if err != nil {
 		writeError(w, err)
 		return
@@ -73,7 +83,12 @@ func (h *OperationHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OperationHandler) List(w http.ResponseWriter, r *http.Request) {
-	var filter repository.OperationFilter
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
+	filter := repository.OperationFilter{UserID: userID}
 	if v := r.URL.Query().Get("asset_id"); v != "" {
 		id, err := parseUintQuery(v)
 		if err != nil {
@@ -108,6 +123,11 @@ func (h *OperationHandler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OperationHandler) Update(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
@@ -122,7 +142,7 @@ func (h *OperationHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	op := req.toDomain()
 	op.ID = id
-	if err := h.operations.Update(r.Context(), op); err != nil {
+	if err := h.operations.Update(r.Context(), userID, op); err != nil {
 		writeError(w, err)
 		return
 	}
@@ -130,13 +150,18 @@ func (h *OperationHandler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OperationHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
 		return
 	}
 
-	if err := h.operations.Delete(r.Context(), id); err != nil {
+	if err := h.operations.Delete(r.Context(), userID, id); err != nil {
 		writeError(w, err)
 		return
 	}

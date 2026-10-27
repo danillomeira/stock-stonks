@@ -18,10 +18,10 @@ func NewPositionService(operations repository.OperationRepository) *PositionServ
 	return &PositionService{operations: operations}
 }
 
-// ForAsset replays every Operation for assetID in date order and returns the
-// resulting Position.
-func (s *PositionService) ForAsset(ctx context.Context, assetID uint) (domain.Position, error) {
-	filter := repository.OperationFilter{AssetID: &assetID}
+// ForAsset replays every Operation for assetID (within userID's own data) in
+// date order and returns the resulting Position.
+func (s *PositionService) ForAsset(ctx context.Context, userID, assetID uint) (domain.Position, error) {
+	filter := repository.OperationFilter{UserID: userID, AssetID: &assetID}
 	ops, err := s.operations.List(ctx, filter)
 	if err != nil {
 		return domain.Position{}, err
@@ -34,9 +34,9 @@ func (s *PositionService) ForAsset(ctx context.Context, assetID uint) (domain.Po
 	return pos, nil
 }
 
-// All returns the current Position for every asset that has at least one operation.
-func (s *PositionService) All(ctx context.Context) ([]domain.Position, error) {
-	ops, err := s.operations.List(ctx, repository.OperationFilter{})
+// All returns the current Position for every asset userID has at least one operation on.
+func (s *PositionService) All(ctx context.Context, userID uint) ([]domain.Position, error) {
+	ops, err := s.operations.List(ctx, repository.OperationFilter{UserID: userID})
 	if err != nil {
 		return nil, err
 	}

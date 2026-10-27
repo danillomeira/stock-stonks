@@ -12,10 +12,11 @@ func TestAsset_Validate(t *testing.T) {
 		asset domain.Asset
 		want  error
 	}{
-		{"empty ticker", domain.Asset{Name: "Petrobras", Type: domain.AssetTypeStock}, domain.ErrInvalidTicker},
-		{"empty name", domain.Asset{Ticker: "PETR4", Type: domain.AssetTypeStock}, domain.ErrInvalidName},
-		{"invalid type", domain.Asset{Ticker: "PETR4", Name: "Petrobras", Type: "CRYPTO"}, domain.ErrInvalidType},
-		{"valid", domain.Asset{Ticker: "PETR4", Name: "Petrobras", Type: domain.AssetTypeStock}, nil},
+		{"missing user", domain.Asset{Ticker: "PETR4", Name: "Petrobras", Type: domain.AssetTypeStock}, domain.ErrInvalidUserID},
+		{"empty ticker", domain.Asset{UserID: 1, Name: "Petrobras", Type: domain.AssetTypeStock}, domain.ErrInvalidTicker},
+		{"empty name", domain.Asset{UserID: 1, Ticker: "PETR4", Type: domain.AssetTypeStock}, domain.ErrInvalidName},
+		{"invalid type", domain.Asset{UserID: 1, Ticker: "PETR4", Name: "Petrobras", Type: "CRYPTO"}, domain.ErrInvalidType},
+		{"valid", domain.Asset{UserID: 1, Ticker: "PETR4", Name: "Petrobras", Type: domain.AssetTypeStock}, nil},
 	}
 
 	for _, tc := range cases {

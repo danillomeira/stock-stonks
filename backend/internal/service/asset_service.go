@@ -15,32 +15,34 @@ func NewAssetService(assets repository.AssetRepository) *AssetService {
 	return &AssetService{assets: assets}
 }
 
-func (s *AssetService) Create(ctx context.Context, asset *domain.Asset) error {
+func (s *AssetService) Create(ctx context.Context, userID uint, asset *domain.Asset) error {
+	asset.UserID = userID
 	if err := asset.Validate(); err != nil {
 		return err
 	}
 	return s.assets.Create(ctx, asset)
 }
 
-func (s *AssetService) Get(ctx context.Context, id uint) (*domain.Asset, error) {
-	return s.assets.GetByID(ctx, id)
+func (s *AssetService) Get(ctx context.Context, userID, id uint) (*domain.Asset, error) {
+	return s.assets.GetByID(ctx, userID, id)
 }
 
-func (s *AssetService) GetByTicker(ctx context.Context, ticker string) (*domain.Asset, error) {
-	return s.assets.GetByTicker(ctx, ticker)
+func (s *AssetService) GetByTicker(ctx context.Context, userID uint, ticker string) (*domain.Asset, error) {
+	return s.assets.GetByTicker(ctx, userID, ticker)
 }
 
-func (s *AssetService) List(ctx context.Context) ([]domain.Asset, error) {
-	return s.assets.List(ctx)
+func (s *AssetService) List(ctx context.Context, userID uint) ([]domain.Asset, error) {
+	return s.assets.List(ctx, userID)
 }
 
-func (s *AssetService) Update(ctx context.Context, asset *domain.Asset) error {
+func (s *AssetService) Update(ctx context.Context, userID uint, asset *domain.Asset) error {
+	asset.UserID = userID
 	if err := asset.Validate(); err != nil {
 		return err
 	}
 	return s.assets.Update(ctx, asset)
 }
 
-func (s *AssetService) Delete(ctx context.Context, id uint) error {
-	return s.assets.Delete(ctx, id)
+func (s *AssetService) Delete(ctx context.Context, userID, id uint) error {
+	return s.assets.Delete(ctx, userID, id)
 }

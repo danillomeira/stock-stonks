@@ -15,7 +15,12 @@ func NewPositionHandler(positions *service.PositionService) *PositionHandler {
 }
 
 func (h *PositionHandler) List(w http.ResponseWriter, r *http.Request) {
-	positions, err := h.positions.All(r.Context())
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
+	positions, err := h.positions.All(r.Context(), userID)
 	if err != nil {
 		writeError(w, err)
 		return
@@ -24,13 +29,18 @@ func (h *PositionHandler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PositionHandler) Get(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
 		return
 	}
 
-	position, err := h.positions.ForAsset(r.Context(), id)
+	position, err := h.positions.ForAsset(r.Context(), userID, id)
 	if err != nil {
 		writeError(w, err)
 		return

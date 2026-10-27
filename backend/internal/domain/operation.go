@@ -27,6 +27,7 @@ func (t OperationType) Valid() bool {
 // rounding error across thousands of trades.
 type Operation struct {
 	ID      uint  `gorm:"primaryKey"`
+	UserID  uint  `gorm:"not null;index"`
 	AssetID uint  `gorm:"not null;index"`
 	Asset   Asset `gorm:"foreignKey:AssetID"`
 
@@ -52,6 +53,9 @@ var (
 
 // Validate enforces the invariants an Operation must hold before it is persisted.
 func (o *Operation) Validate() error {
+	if o.UserID == 0 {
+		return ErrInvalidUserID
+	}
 	if o.AssetID == 0 {
 		return ErrInvalidAssetID
 	}

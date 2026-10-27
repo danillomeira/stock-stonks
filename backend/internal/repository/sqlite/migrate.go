@@ -12,7 +12,7 @@ import (
 // versioned SQL files is the planned path once a networked database (see
 // database.Open) is introduced, so schema changes stop being implicit.
 func AutoMigrate(db *gorm.DB) error {
-	if err := db.AutoMigrate(&domain.Asset{}, &domain.Operation{}); err != nil {
+	if err := db.AutoMigrate(&domain.User{}, &domain.Asset{}, &domain.Operation{}); err != nil {
 		return fmt.Errorf("sqlite: automigrate: %w", err)
 	}
 	return nil

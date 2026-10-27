@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { AuthGate } from "@/components/AuthGate";
+import { UserMenu } from "@/components/UserMenu";
+import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,21 +35,26 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900">
-        <header className="border-b border-neutral-200 bg-white">
-          <nav className="mx-auto flex max-w-5xl items-center gap-6 px-4 py-3">
-            <span className="font-semibold">Stock-Stonks</span>
-            <ul className="flex gap-4 text-sm text-neutral-600">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="hover:text-neutral-900">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+        <AuthProvider>
+          <header className="border-b border-neutral-200 bg-white">
+            <nav className="mx-auto flex max-w-5xl items-center gap-6 px-4 py-3">
+              <span className="font-semibold">Stock-Stonks</span>
+              <ul className="flex flex-1 gap-4 text-sm text-neutral-600">
+                {NAV_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="hover:text-neutral-900">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <UserMenu />
+            </nav>
+          </header>
+          <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+            <AuthGate>{children}</AuthGate>
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

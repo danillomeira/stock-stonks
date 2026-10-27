@@ -6,10 +6,11 @@ de um MVP.
 
 ## Status
 
-MVP: cadastro de ativos, registro de operações (compra/venda) e cálculo de
+MVP: login com Google (multiusuário — cada conta vê só os próprios dados),
+cadastro de ativos, registro de operações (compra/venda) e cálculo de
 posição (preço médio, lucro realizado) pelo método de custo médio ponderado.
-Exportação para IR e classificação de day-trade ainda não implementadas —
-veja `specs/` para o roadmap.
+Cotação em tempo real, exportação para IR e classificação de day-trade ainda
+não implementadas — veja `specs/` para o roadmap.
 
 ## Stack
 
@@ -34,7 +35,23 @@ go run ./cmd/api
 Variáveis de ambiente (todas com default razoável para dev, ver
 `backend/internal/config/config.go`): `HTTP_PORT`, `DB_DRIVER`, `DB_DSN`,
 `CORS_ALLOW_ORIGIN`, `DB_RETRY_MAX_ATTEMPTS`, `DB_RETRY_BASE_DELAY`,
-`DB_RETRY_MAX_DELAY`.
+`DB_RETRY_MAX_DELAY`. Sem `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` o
+servidor roda normalmente — só o login fica indisponível (ver abaixo).
+
+#### Login com Google
+
+1. No [Google Cloud Console](https://console.cloud.google.com/apis/credentials),
+   crie um **OAuth client ID** do tipo "Web application".
+2. Em "Authorized redirect URIs", adicione
+   `http://localhost:8080/api/v1/auth/google/callback`.
+3. Exporte as credenciais antes de rodar o backend:
+   ```sh
+   export GOOGLE_CLIENT_ID=...
+   export GOOGLE_CLIENT_SECRET=...
+   ```
+4. (Opcional) `SESSION_SECRET=<valor fixo>` para a sessão sobreviver a um
+   restart do servidor — sem isso, um segredo aleatório é gerado a cada
+   execução e todo mundo precisa logar de novo (ver ADR 0009).
 
 ### Frontend
 

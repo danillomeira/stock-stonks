@@ -8,6 +8,14 @@ services:
       - DB_DRIVER=sqlite
       - DB_DSN=file:/app/data/stock-stonks.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)
       - CORS_ALLOW_ORIGIN=http://localhost:3000
+      # Google login needs real credentials from Google Cloud Console - see
+      # README.md "Login Google". Leave unset to run everything except login.
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - GOOGLE_REDIRECT_URL=http://localhost:8080/api/v1/auth/google/callback
+      # Set this to a fixed random value if you want sessions to survive a
+      # container restart; otherwise one is generated per run (see ADR 0009).
+      - SESSION_SECRET=${SESSION_SECRET:-}
     volumes:
       - backend-data:/app/data
 

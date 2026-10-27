@@ -63,13 +63,14 @@ func TestOperation_Validate(t *testing.T) {
 		op   domain.Operation
 		want error
 	}{
-		{"missing asset", domain.Operation{Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidAssetID},
-		{"bad type", domain.Operation{AssetID: 1, Type: "HOLD", Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidOperation},
-		{"zero quantity", domain.Operation{AssetID: 1, Type: domain.OperationBuy, Quantity: dec("0"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidQuantity},
-		{"zero price", domain.Operation{AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("0"), Date: time.Now()}, domain.ErrInvalidUnitPrice},
-		{"negative fees", domain.Operation{AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Fees: dec("-1"), Date: time.Now()}, domain.ErrNegativeFees},
-		{"zero date", domain.Operation{AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1")}, domain.ErrInvalidDate},
-		{"valid", domain.Operation{AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, nil},
+		{"missing user", domain.Operation{AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidUserID},
+		{"missing asset", domain.Operation{UserID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidAssetID},
+		{"bad type", domain.Operation{UserID: 1, AssetID: 1, Type: "HOLD", Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidOperation},
+		{"zero quantity", domain.Operation{UserID: 1, AssetID: 1, Type: domain.OperationBuy, Quantity: dec("0"), UnitPrice: dec("1"), Date: time.Now()}, domain.ErrInvalidQuantity},
+		{"zero price", domain.Operation{UserID: 1, AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("0"), Date: time.Now()}, domain.ErrInvalidUnitPrice},
+		{"negative fees", domain.Operation{UserID: 1, AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Fees: dec("-1"), Date: time.Now()}, domain.ErrNegativeFees},
+		{"zero date", domain.Operation{UserID: 1, AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1")}, domain.ErrInvalidDate},
+		{"valid", domain.Operation{UserID: 1, AssetID: 1, Type: domain.OperationBuy, Quantity: dec("1"), UnitPrice: dec("1"), Date: time.Now()}, nil},
 	}
 
 	for _, tc := range cases {

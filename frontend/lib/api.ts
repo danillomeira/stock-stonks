@@ -1,5 +1,16 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
+export interface User {
+  ID: number;
+  Email: string;
+  Name: string;
+  AvatarURL: string;
+}
+
+// Full-page navigation, not fetch: the browser needs to actually land on
+// Google's consent screen and come back with a session cookie set.
+export const googleLoginURL = `${API_URL}/api/v1/auth/google/login`;
+
 export type AssetType = "STOCK" | "FII" | "ETF" | "BDR";
 
 export interface Asset {
@@ -32,7 +43,7 @@ export interface Position {
   RealizedProfit: string;
 }
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
     this.name = "ApiError";
@@ -42,6 +53,9 @@ class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
+    // The session lives in an HttpOnly cookie set by the backend; without
+    // this the browser won't send it cross-port (localhost:3000 -> :8080).
+    credentials: "include",
     headers: { "Content-Type": "application/json", ...init?.headers },
   });
 
@@ -56,6 +70,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  getMe: () => request<User>("/api/v1/auth/me"),
+  logout: () => request<void>("/api/v1/auth/logout", { method: "POST" }),
+
   listAssets: () => request<Asset[]>("/api/v1/assets"),
   createAsset: (input: { ticker: string; name: string; type: AssetType }) =>
     request<Asset>("/api/v1/assets", { method: "POST", body: JSON.stringify(input) }),

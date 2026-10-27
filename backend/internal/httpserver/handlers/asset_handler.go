@@ -24,6 +24,11 @@ type assetRequest struct {
 }
 
 func (h *AssetHandler) Create(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	var req assetRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: "invalid request body"})
@@ -31,7 +36,7 @@ func (h *AssetHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	asset := &domain.Asset{Ticker: req.Ticker, Name: req.Name, Type: req.Type}
-	if err := h.assets.Create(r.Context(), asset); err != nil {
+	if err := h.assets.Create(r.Context(), userID, asset); err != nil {
 		writeError(w, err)
 		return
 	}
@@ -39,13 +44,18 @@ func (h *AssetHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AssetHandler) Get(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
 		return
 	}
 
-	asset, err := h.assets.Get(r.Context(), id)
+	asset, err := h.assets.Get(r.Context(), userID, id)
 	if err != nil {
 		writeError(w, err)
 		return
@@ -54,7 +64,12 @@ func (h *AssetHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AssetHandler) List(w http.ResponseWriter, r *http.Request) {
-	assets, err := h.assets.List(r.Context())
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
+	assets, err := h.assets.List(r.Context(), userID)
 	if err != nil {
 		writeError(w, err)
 		return
@@ -63,6 +78,11 @@ func (h *AssetHandler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AssetHandler) Update(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
@@ -76,7 +96,7 @@ func (h *AssetHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	asset := &domain.Asset{ID: id, Ticker: req.Ticker, Name: req.Name, Type: req.Type}
-	if err := h.assets.Update(r.Context(), asset); err != nil {
+	if err := h.assets.Update(r.Context(), userID, asset); err != nil {
 		writeError(w, err)
 		return
 	}
@@ -84,13 +104,18 @@ func (h *AssetHandler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AssetHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	userID, ok := requireUserID(w, r)
+	if !ok {
+		return
+	}
+
 	id, err := parseIDParam(r)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, errorBody{Error: err.Error()})
 		return
 	}
 
-	if err := h.assets.Delete(r.Context(), id); err != nil {
+	if err := h.assets.Delete(r.Context(), userID, id); err != nil {
 		writeError(w, err)
 		return
 	}

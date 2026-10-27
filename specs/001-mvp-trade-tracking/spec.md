@@ -26,7 +26,8 @@ point in time.
 - Day-trade vs. swing-trade classification (future spec — changes applicable
   IR rate, not handled yet).
 - Dividends/proventos tracking (future spec).
-- Authentication/multi-user (single-user local tool for now).
+- Authentication/multi-user (single-user local tool for now — superseded by
+  `specs/002-google-auth-multiuser/`).
 - Frontend UI beyond a basic list/registration page.
 
 ## User-facing behavior
