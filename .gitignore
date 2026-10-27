@@ -1,0 +1,24 @@
+# Backend (Go)
+backend/data/*.db
+backend/data/*.db-*
+backend/bin/
+backend/tmp/
+*.test
+
+# Frontend (Next.js)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env*.local
+frontend/next-env.d.ts
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env files with secrets
+.env
+.env.local
+!.env.example

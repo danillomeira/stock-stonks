@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - HTTP_PORT=8080
+      - DB_DRIVER=sqlite
+      - DB_DSN=file:/app/data/stock-stonks.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)
+      - CORS_ALLOW_ORIGIN=http://localhost:3000
+    volumes:
+      - backend-data:/app/data
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      - backend
+
+volumes:
+  backend-data:
