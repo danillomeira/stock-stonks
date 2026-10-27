@@ -7,8 +7,8 @@ Changes to this document are themselves architectural decisions and require an A
 ## 1. Purpose
 
 Stock-Stonks tracks stock/FII/ETF/BDR trades (compra/venda) and exports data for
-Brazilian income tax (Imposto de Renda) reporting, in the spirit of the Bastter
-System, starting from an MVP and growing feature by feature.
+Brazilian income tax (Imposto de Renda) reporting, starting from an MVP and
+growing feature by feature.
 
 ## 2. Stack
 

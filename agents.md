@@ -6,8 +6,7 @@ any coding agent should read before working in this repo.
 ## What this project is
 
 Stock-Stonks tracks stock/FII/ETF/BDR trades and will export data for
-Brazilian Imposto de Renda (income tax) reporting — in the spirit of the
-Bastter System, built incrementally.
+Brazilian Imposto de Renda (income tax) reporting, built incrementally.
 
 ## Read these first
 

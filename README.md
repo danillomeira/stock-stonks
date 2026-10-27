@@ -1,8 +1,8 @@
 # Stock-Stonks
 
 Acompanhamento e registro de operações em ações (e FIIs/ETFs/BDRs), com
-exportação de dados para o Imposto de Renda — inspirado no Bastter System,
-construído em etapas a partir de um MVP.
+exportação de dados para o Imposto de Renda, construído em etapas a partir
+de um MVP.
 
 ## Status
 
